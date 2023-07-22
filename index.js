@@ -8,11 +8,11 @@ const bodyParser = require("body-parser");
 const { z } = require("zod");
 
 app.use(bodyParser.json());
-
 var corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
+app.use(cors(corsOptions));
 
 const schema = z
   .object({

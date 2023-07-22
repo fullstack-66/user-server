@@ -16,34 +16,25 @@ app.use(cors(corsOptions));
 
 const schema = z
   .object({
-    firstName: z.string().min(1, { message: "Required" }),
-    lastName: z.string().min(1, { message: "Required" }),
+    firstName: z.string().min(1, { message: "Missing firstname" }),
+    lastName: z.string().min(1, { message: "Missing lastname" }),
     email: z.string().email({ message: "Invalid email" }),
-    dateOfBirth: z.string().min(1, { message: "Required" }),
-    password: z
+    dateOfBirth: z
       .string()
-      .min(4, { message: "Must be longer than 4 characters" }),
+      .min(1, { message: "Missing date of birth" })
+      .refine((s) => z.coerce.date().safeParse(s).success, {
+        message: "Invalid date of birth",
+      })
+      .refine((s) => new Date(s) < new Date(), {
+        message: "Wrong calendar",
+      }),
+    password: z.string().min(4, { message: "Password too short" }),
+    confirmPassword: z.string().min(1, { message: "Confirm password" }),
   })
-  .refine(
-    (data) => {
-      return z.coerce.date().safeParse(data.dateOfBirth).success;
-    },
-    {
-      message: "Plase input valid date",
-      path: ["dateOfBirth"],
-    }
-  )
-  .refine(
-    (data) => {
-      const nYear = new Date().getFullYear();
-      const bYear = new Date(data.dateOfBirth).getFullYear();
-      return nYear - bYear >= 18;
-    },
-    {
-      message: "You must be 18 years old",
-      path: ["dateOfBirth"],
-    }
-  );
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 const initData = [
   {

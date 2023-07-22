@@ -79,7 +79,7 @@ app.get("/users_wrong", cors(corsOptions), (req, res) => {
 app.post("/users", cors(corsOptions), (req, res) => {
   const result = schema.safeParse(req.body);
   if (result.success) {
-    const { password, ...rest } = req.body;
+    const { password, confirmPassword, ...rest } = req.body;
     const newData = { id: data.length + 1, ...rest };
     data = [newData, ...data];
     setTimeout(() => {
